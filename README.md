@@ -1,24 +1,23 @@
-# formcap
+# formcap: "form capture" server
 
-## what is it?
+While many web services apply a RESTful lens to the data collected in normal web forms, this can be an awkward fit for simple data-collection applications. In those cases, capturing even partial, invalid information may be more valuable than rejecting it. On the other hand, the raw submissions aren't exactly fit for consumption by your application logic; in fact, in some cases all you really want to do is grab the input and make it available for future processing.
 
-a simple microservice that captures form submissions that validate under a provided json schema
-responses can be multipart or json encoded
+The [formcap](https://github.com/rcoder/formcap) project is a small, opinionated Typescript framework that allows you to programatically define "forms" to be submitted over a simple API with only three endpoints:
 
-form submissions are single-use, and designed to interleave form label data and user-supplied values
+1. a read-only form "registry" listing form names and payload types (including both public and private forms)
+2. side-effect free form payload validation
+3. form submission with a "receipt" to be used to verify the form was received and (eventually, maybe) processed/acknowledged/acted upon
 
-micro-surveys, polls, RSVPs, etc.
+Notably, this library does not provide any mechanism for _displaying_ forms in a browser, or persisting the submitted results anywhere other than a simple NeDB store. However, it does provide a number of hooks to stream form results out including web hooks, MQTT channels, and swarm-ready hypercore feeds.
 
-responses are available for export as a live feed and/or batch-processing-ready archive
-live feed can be accessed from a browser for dashboards + ad-hoc analysis
+You can register a new form by providing a JSON schema for its child fields, and optionally a short name/slug.
 
-form invites can be open, capped, rate-limited, or single-shot
+I've bundled one concrete implementation of a form registry and submission API server using Fastify. Along with the afore-mentioned NeDB persistence layer, it's enough to implement feedback forms, commenting, surveys, and other basic data collection on your website while otherwise keeping content authoring locked inside your git repo + static site generator, headless CMS, or bespoke web publishing tool that can't for whatever reason be easily extended with user-supplied form handlers.
 
-data to be collected is specified with a json schema
-response metadata lives in separate schema (nedb/mongo)
+Likewise, there's a small Vue component included that tries to render a simple HTML version of your registered forms, display validation errors in context, and eventually submit entries for processing.
 
-simplest option: don't enforce schemas, but attach them as metadata
-buffer inbound requests that fail due to unvalidated submission cap
-(soft limit starts when total submissions hit desired cap, with hard limit coming in after that and throttling all inbounds until the total fills or the backlog is cleared; could be weaponized by someone who had the reply token, but only up to their individual rate limit bucket, which could quickly get quite limited indeed after they start failing validations)
-(nedb in-memory could do this, as could mongo with stale reads or redis)
+## What is it _Not_ For?
 
+I would strongly urge you not to collect anything more sensitive than an email address using this framework. While formcap avoids some very trivial attacks (no sequential IDs for URL-surfing of private forms or responses, no godlike "admin" view in the web UI that can leak all your secrets and historical data), security has not been a major focus in its design. In fact, some of the light protections against flooding/spamming/etc. could just as easily be weaponized for DoSing the form submission endpoint to lock out other clients.
+
+Likewise, while I've tried to avoid any obvious source of awful slowdown, this has yet to be tested "in anger" when facing really serious load. I'd rather keep the scope narrow and implementation simple than get into contortions trying to make this potentially stand up to "hyper-growth" load. Don't put your timing-critical, transactional data processing through this API unless you're comfortable profiling it and patching/rewriting critical paths as needed.
