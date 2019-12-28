@@ -33,11 +33,11 @@ Object.freeze(ContactForm)
 
 export const CommentSchema = Object.freeze({
   type: 'object',
-  required: ['username', 'message', 'refId'],
+  required: ['username', 'message'],
   properties: {
     username: { type: 'string', maxLength: 32 },
     message: { type: 'string', maxLength: 1000 },
-    refId: { type: 'string', format: 'uuid' }
+    ref: { type: 'string', maxLength: 1000 }
   }
 })
 

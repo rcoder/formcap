@@ -33,7 +33,7 @@ export namespace Publishing {
     readonly type = 'form'
 
     @f slug?: string
-
+    @f description?: string
     @f ownerId?: string
 
     @f.enum(Visibility)

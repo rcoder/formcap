@@ -37,7 +37,7 @@ const toFields = (form: Publishing.Form) =>
 
   while (again) {
     let subData = (await prompt<{ submission: any }>({
-	name: 'submission',
+	namagaine: 'submission',
 	type: 'form',
 	message: formPicked.form,
 	choices: toFields(form as Publishing.Form)
