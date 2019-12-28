@@ -2,27 +2,51 @@ import { f, uuid } from '@marcj/marshal'
 import { produce } from 'immer'
 import Ajv from 'ajv'
 
+import 'reflect-metadata'
+
 export namespace Publishing {
   export enum Visibility {
-    DRAFT = 0,
-    PRIVATE = 1,
-
-    PUBLIC = 2,
-    DELETED = -1
+    DRAFT = 'draft',
+    PRIVATE = 'private',
+    PUBLIC = 'public',
+    DELETED = 'deleted'
   }
 
-  class Artifact {
+  export enum Interval {
+    SECOND = 1000,
+    MINUTE = 60 * SECOND,
+    HOUR = 60 * MINUTE,
+    DAY = 24 * HOUR
+  }
+
+  export class Limits {
+    total?: number
+    rate?: { interval: Interval, count: number }
+    perClient?: number
+  }
+
+  export class Form {
     @f.primary().uuid()
-    id: string = uuid()
+    _id: string = uuid()
+
+    @f.type(String)
+    readonly type = 'form'
+
+    @f slug?: string
+
+    @f ownerId?: string
 
     @f.enum(Visibility)
     visibility: Visibility = Visibility.DRAFT
 
     @f publishedAt?: Date
+    @f expires?: Date
 
-    @f slug?: string
+    @f.type(Limits)
+    limits?: Limits
 
-    @f ownerId?: string
+    @f.any()
+    schema?: any
 
     publish(slug?: string, visibility: Visibility = Visibility.PRIVATE): this {
       return produce(this, draft => {
@@ -41,39 +65,6 @@ export namespace Publishing {
 	draft.visibility = Visibility.DELETED
       })
     }
-  }
-
-  export class Page extends Artifact {
-    @f content: string
-
-    constructor(content: string) {
-      super()
-      this.content = content
-    }
-  }
-
-  export enum Interval {
-    SECOND = 1000,
-    MINUTE = 60 * SECOND,
-    HOUR = 60 * MINUTE,
-    DAY = 24 * HOUR
-  }
-
-  export class Limits {
-    total?: number
-    rate?: { interval: Interval, count: number }
-    perClient?: number
-  }
-
-  export class Form extends Artifact {
-    @f.enum(Visibility)
-    visibility: Visibility = Visibility.DRAFT
-
-    @f.type(Limits)
-    limits?: Limits
-
-    @f.any()
-    schema?: any
 
     get strictSchema() {
       return { additionalProperties: false, ...this.schema }
@@ -81,7 +72,7 @@ export namespace Publishing {
 
     async submit(clientId: string, values: any): Promise<Submission> {
       // TODO: enforce + maintain limits
-      let submission = new Submission(this.id, clientId)
+      let submission = new Submission(this._id, clientId)
       submission.values = values
 
       if (this.schema) {
@@ -116,7 +107,10 @@ export namespace Publishing {
 
   export class Submission {
     @f.primary().uuid()
-    id: string = uuid()
+    _id: string = uuid()
+
+    @f.type(String)
+    readonly type = 'submission'
 
     @f.uuid()
     formId: string

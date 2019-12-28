@@ -12,16 +12,6 @@ export const SignupSchema = Object.freeze({
 
 export const SignupForm = new Publishing.Form()
 
-SignupForm.limits = {
-  rate: {
-    // 100 signups per day
-    count: 100,
-    interval: Publishing.Interval.DAY,
-  },
-  // and only one per client (need to make this not trivial to circumvent or trip accidentally)
-  perClient: 1
-}
-
 SignupForm.schema = SignupSchema
 SignupForm.publish('sign-up', Publishing.Visibility.PUBLIC)
 Object.freeze(SignupForm)
@@ -37,14 +27,23 @@ export const ContactSchema = Object.freeze({
 
 export const ContactForm = new Publishing.Form()
 
-ContactForm.limits = {
-  rate: {
-    // 100 contact requests per hour
-    count: 100,
-    interval: Publishing.Interval.HOUR
-  }
-}
-
 ContactForm.schema = ContactSchema
 ContactForm.publish('contact', Publishing.Visibility.PUBLIC)
 Object.freeze(ContactForm)
+
+export const CommentSchema = Object.freeze({
+  type: 'object',
+  required: ['username', 'message', 'refId'],
+  properties: {
+    username: { type: 'string', maxLength: 32 },
+    message: { type: 'string', maxLength: 1000 },
+    refId: { type: 'string', format: 'uuid' }
+  }
+})
+
+export const CommentForm = new Publishing.Form()
+
+CommentForm.schema = CommentSchema
+CommentForm.publish('comment', Publishing.Visibility.PUBLIC)
+Object.freeze(CommentForm)
+
