@@ -20,9 +20,9 @@ abstract class TypedStore<T extends { _id: string }> {
     return doc
   }
 
-  async find(filter: any): Promise<any> {
+  async find(filter: any): Promise<T[]> {
     let cursor = await this.db.find(filter).exec()
-    return cursor
+    return cursor.map(doc => plainToClass(this.marshalClass, doc))
   }
 }
 
@@ -43,8 +43,7 @@ const openDb = (name: string, baseDir: string='.') => Datastore.create({
   filename: `${baseDir}/${name}.db`
 })
 
-export function openStorage(baseDir?: string): StorageContext {
-  let forms = new FormStore(openDb('forms', baseDir))
-  let submissions = new SubmissionStore(openDb('subs', baseDir))
-  return { forms, submissions }
-}
+export const openStorage = (baseDir?: string) => ({
+  forms: new FormStore(openDb('forms', baseDir)),
+  submissions: new SubmissionStore(openDb('subs', baseDir))
+})
