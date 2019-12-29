@@ -14,7 +14,7 @@ You can register a new form by providing a JSON schema for its child fields, and
 
 I've bundled one concrete implementation of a form registry and submission API server using Fastify. Along with the afore-mentioned NeDB persistence layer, it's enough to implement feedback forms, commenting, surveys, and other basic data collection on your website while otherwise keeping content authoring locked inside your git repo + static site generator, headless CMS, or bespoke web publishing tool that can't for whatever reason be easily extended with user-supplied form handlers.
 
-Likewise, there's a small Vue component included that tries to render a simple HTML version of your registered forms, display validation errors in context, and eventually submit entries for processing.
+The `scripts/cli.ts` file contains the first sketch of a command-line interface that can directly manipulate the same form submission queue, pointing the way towards "isomorphic" interfaces that can be reused between API clients, web UI, CLI tools, etc.
 
 ## What is it _Not_ For?
 
