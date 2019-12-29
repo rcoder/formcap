@@ -2,17 +2,26 @@ import { Publishing } from './models'
 
 export const SignupSchema = Object.freeze({
   type: 'object',
-  required: ['username', 'email', 'password'],
+  required: ['username', 'email', 'invite'],
   properties: {
     username: { type: 'string', maxLength: 32 },
     email: { type: 'string', format: 'email' },
-    password: { type: 'string', minLength: 6, maxLength: 32 }
+    phone: { type: 'string' }
+  }
+})
+
+export const InviteSchema = Object.freeze({
+  type: 'object',
+  required: [],
+  properties: {
+    limit: { type: 'number' }
   }
 })
 
 export const SignupForm = new Publishing.Form()
 
 SignupForm.schema = SignupSchema
+SignupForm.responseSchema = InviteSchema
 SignupForm.publish('sign-up', Publishing.Visibility.PUBLIC)
 Object.freeze(SignupForm)
 
@@ -28,6 +37,7 @@ export const ContactSchema = Object.freeze({
 export const ContactForm = new Publishing.Form()
 
 ContactForm.schema = ContactSchema
+ContactForm.responseSchema = ContactSchema
 ContactForm.publish('contact', Publishing.Visibility.PUBLIC)
 Object.freeze(ContactForm)
 
@@ -44,6 +54,7 @@ export const CommentSchema = Object.freeze({
 export const CommentForm = new Publishing.Form()
 
 CommentForm.schema = CommentSchema
+CommentForm.responseSchema = CommentSchema
 CommentForm.publish('comment', Publishing.Visibility.PUBLIC)
 Object.freeze(CommentForm)
 

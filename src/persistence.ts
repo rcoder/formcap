@@ -34,9 +34,14 @@ export class SubmissionStore extends TypedStore<Publishing.Submission> {
   marshalClass = Publishing.Submission
 }
 
+export class ResponseStore extends TypedStore<Publishing.Response> {
+  marshalClass = Publishing.Response
+}
+
 export interface StorageContext {
   forms: FormStore,
-  submissions: SubmissionStore
+  submissions: SubmissionStore,
+  responses: ResponseStore
 }
 
 const openDb = (name: string, baseDir: string='.') => Datastore.create({
@@ -45,5 +50,6 @@ const openDb = (name: string, baseDir: string='.') => Datastore.create({
 
 export const openStorage = (baseDir?: string) => ({
   forms: new FormStore(openDb('forms', baseDir)),
-  submissions: new SubmissionStore(openDb('subs', baseDir))
+  submissions: new SubmissionStore(openDb('subs', baseDir)),
+  responses: new ResponseStore(openDb('resps', baseDir))
 })

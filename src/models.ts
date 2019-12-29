@@ -48,6 +48,9 @@ export namespace Publishing {
     @f.any()
     schema?: any
 
+    @f.any()
+    responseSchema?: any
+
     publish(slug?: string, visibility: Visibility = Visibility.PRIVATE): this {
       return produce(this, draft => {
 	if (visibility === Visibility.PUBLIC) {
@@ -115,8 +118,7 @@ export namespace Publishing {
     @f.uuid()
     formId: string
 
-    @f.uuid()
-    clientId: string
+    @f clientId: string
 
     @f.any()
     values: any
@@ -125,6 +127,32 @@ export namespace Publishing {
     validation?: Validation
 
     constructor(formId: string, clientId: string, values?: any) {
+      this.formId = formId
+      this.clientId = clientId
+      this.values = values
+    }
+  }
+
+  export class Response {
+    @f.primary().uuid()
+    _id: string = uuid()
+
+    @f.type(String)
+    readonly type = 'response'
+
+    @f.uuid()
+    formId: string
+
+    @f.uuid()
+    submissionId: string
+
+    @f clientId: string
+
+    @f.any()
+    values: any
+
+    constructor(submissionId: string, formId: string, clientId: string, values?: any) {
+      this.submissionId = submissionId
       this.formId = formId
       this.clientId = clientId
       this.values = values
