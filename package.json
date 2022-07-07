@@ -13,7 +13,7 @@
     "immer": "^5.1.0",
     "immutable": "^4.0.0-rc.12",
     "lru-cache": "^5.1.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "ms": "^2.1.2",
     "nedb-promises": "^4.0.0",
     "parcel-bundler": "^1.12.4",
